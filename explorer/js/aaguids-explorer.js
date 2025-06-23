@@ -48,10 +48,13 @@ document.onreadystatechange = async () => {
       const table = $("#aaguids");
       appendRow(table, `
       <tr>
-        <th>AAGUID <br/></th>
+        <th>AAGUID <br/>
+          <input id="filter-aaguid" type="text" placeholder="Filter by AAGUID..."/>
+          <a id="clear-filter-aaguid" href="#" title="clear">X</a>
+        </th>
         <th>Name <br/> 
-          <input id="filter" type="text" placeholder="Filter by name..."/>
-          <a id="clear-filter" href="#" title="clear">X</a>
+          <input id="filter-name" type="text" placeholder="Filter by name..."/>
+          <a id="clear-filter-name" href="#" title="clear">X</a>
         </th>
         <th>Icon light</th>
         <th class="dark">Icon dark</th>
@@ -62,7 +65,7 @@ document.onreadystatechange = async () => {
         if (Object.hasOwnProperty.call(json, aaguid)) {
           appendRow(table, `
           <tr>
-            <td>${aaguid}</td>
+            <td class="aaguid">${aaguid}</td>
             <td class="name">${json[aaguid].name}</td>
             <td class="icon">${imageTag(json[aaguid].icon_light)}</td>
             <td class="icon dark">${imageTag(json[aaguid].icon_dark)}</td>
@@ -71,21 +74,49 @@ document.onreadystatechange = async () => {
         }
       }
 
-      function applyFilter(filter) {
+      function applyFilters() {
+        const nameFilter = $("#filter-name")?.value?.toLowerCase() || "";
+        const aaguidFilter = $("#filter-aaguid")?.value?.toLowerCase() || "";
+        
         $$("#aaguids tr").forEach( (row) => {
-          const name = row.querySelector("td.name")?.innerText?.toLowerCase();
-          const show =  !filter || (!name || name.indexOf(filter.toLowerCase()) >= 0);
+          // Skip the header row (it has th elements, not td elements)
+          if (row.querySelector("th")) {
+            return;
+          }
+          
+          const nameCell = row.querySelector("td.name");
+          const aaguidCell = row.querySelector("td.aaguid");
+          
+          if (!nameCell || !aaguidCell) {
+            return;
+          }
+          
+          const name = nameCell.innerText?.toLowerCase() || "";
+          const aaguid = aaguidCell.innerText?.toLowerCase() || "";
+          
+          const nameMatch = !nameFilter || name.indexOf(nameFilter) >= 0;
+          const aaguidMatch = !aaguidFilter || aaguid.indexOf(aaguidFilter) >= 0;
+          const show = nameMatch && aaguidMatch;
+          
           row.style.display = (show ? 'table-row' : 'none');
         });
       }
 
-      $("#filter").addEventListener("keyup", () => {
-        applyFilter($("#filter").value);
+      // Add event listeners for both keyup and input events for better responsiveness
+      $("#filter-name").addEventListener("keyup", applyFilters);
+      $("#filter-name").addEventListener("input", applyFilters);
+      $("#filter-aaguid").addEventListener("keyup", applyFilters);
+      $("#filter-aaguid").addEventListener("input", applyFilters);
+
+      $("#clear-filter-name").addEventListener("click", (event) => {
+        $("#filter-name").value = "";
+        applyFilters();
+        event.preventDefault();
       });
 
-      $("#clear-filter").addEventListener("click", (event) => {
-        $("#filter").value = "";
-        applyFilter();
+      $("#clear-filter-aaguid").addEventListener("click", (event) => {
+        $("#filter-aaguid").value = "";
+        applyFilters();
         event.preventDefault();
       });
 

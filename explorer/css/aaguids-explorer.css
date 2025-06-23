@@ -116,8 +116,26 @@ a {
 #aaguids th:nth-of-type(2) {
   min-width: 20em;
 }
-#filter {
+#filter-name, #filter-aaguid {
   width: 80%;
+  margin-bottom: 5px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+#clear-filter-name, #clear-filter-aaguid {
+  margin-left: 5px;
+  padding: 2px 6px;
+  background-color: #f44336;
+  color: white;
+  border-radius: 3px;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+#clear-filter-name:hover, #clear-filter-aaguid:hover {
+  background-color: #da190b;
 }
 footer {
   color: grey;
